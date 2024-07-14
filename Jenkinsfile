@@ -35,13 +35,11 @@ pipeline {
                         // sh 'ssh -o StrictHostKeyChecking=no root@192.168.227.128 "ls -l /"'
                         sh """
                         echo '================开始部署程序================'
-                        scp -r -o StrictHostKeyChecking=no build/* root@192.168.227.128:/tmp/
+                        scp -r -o StrictHostKeyChecking=no build/* root@192.168.227.128:/data/apps/webapps/dist/
                         ssh -o StrictHostKeyChecking=no root@192.168.227.128 <<EOF
-                            cd /tmp
-                            ls
                         EOF
-                        echo '================结束部署程序================'
                     """
+                        echo '================结束部署程序================'
                     }
                 }
 
