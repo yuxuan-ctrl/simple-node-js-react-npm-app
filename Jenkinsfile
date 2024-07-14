@@ -1,19 +1,14 @@
 pipeline {
-    agent any      
+    agent any
+    tools { nodejs 'nodejs:latest' } // 使用别名 'nodejs:latest' 指定Node.js版本22.4.1
 
     stages {
         stage('Hello') {
             steps {
                 echo 'Hello World'
-                sh 'node -v' // This will print the Node.js version
-            }
-        }
-        // 这里的hello2 是我加的，就是说明，这是stages下的第二个任务 ,就是在pipeline中加单行注释 用 // 就行
-        stage('Hello2') {
-            steps {
-                echo 'Hello World'
-                sh 'npm -v' 
-
+                withEnv(["PATH+NODEJS=${tool 'nodejs:latest'}"]) {
+                    sh 'node -v'
+                }
             }
         }
     }
