@@ -38,8 +38,7 @@ pipeline {
                         scp -r -o StrictHostKeyChecking=no build/* root@192.168.227.128:/tmp/
                         ssh -o StrictHostKeyChecking=no root@192.168.227.128 <<EOF
                             cd /tmp
-                            unzip build.zip -d /var/www/html # 假设您的应用需要部署到/var/www/html
-                            rm build.zip # 可选：移除已解压的ZIP文件
+                            ls
                         EOF
                         echo '================结束部署程序================'
                     """
