@@ -29,17 +29,17 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploy'
-                // sshagent(credentials: ['jenkins']) {
-                //     echo 'Logining ==========================Deploy Source'
-                //     sh 'ssh -vvv root@192.168.227.128 "ls -l /"'
-                // }
-                sh """
-                                                        echo '================开始部署程序================'
-                                                        ssh -o StrictHostKeyChecking=no root@192.168.227.128 <<EOF
-                                                        ls -l
-                                        				EOF
-                                        			echo '================结束部署程序================'
-                                                 """
+                sshagent(credentials: ['jenkins']) {
+                    echo 'Logining ==========================Deploy Source'
+                    sh 'ssh -o StrictHostKeyChecking=no root@192.168.227.128 "ls -l /"'
+                }
+                // sh """
+                //                                         echo '================开始部署程序================'
+                //                                         ssh -o StrictHostKeyChecking=no root@192.168.227.128 <<EOF
+                //                                         ls -l
+                //                                         EOF
+                //                                     echo '================结束部署程序================'
+                //                                  """
             }
         }
     }
