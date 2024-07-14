@@ -1,0 +1,89 @@
+
+pipeline {
+        agent any
+        parameters {
+            string(name: 'service_name', defaultValue: 'dpd-portal-mobile', description: '服务名：dpd-portal-web|dpd-portal-mobile|dpd-portal|dpd-portal-job-admin|dpd-portal-job-executor-springboot|api-gateway|sys-center|file-center|search-center|statis-center|dmd-center|catalog-center') 
+            string(name: 'deploy_account', defaultValue: 'zhushuxian', description: '研发中台登录账号') 
+            string(name: 'deploy_password', defaultValue: 'no', description: '研发中台登录密码') 
+        }
+              stages {
+                      stage('测试环境部署') {
+                            steps {
+                                script {
+                                         stage('下载部署包') {
+                                                 sh """
+                                                        echo '================开始下载部署包================'
+                                                        ssh  test@173.16.11.83 <<EOF
+                                        				source  /etc/profile
+                                                        sh /home/test/deploy.sh "${params.service_name}" "${params.deploy_account}" '${params.deploy_password}'
+                                        				exit
+                                        				EOF
+                                        			echo '================结束下载部署包================'
+                                                 """
+                                        }
+										stage('部署'){
+												echo '================开始部署程序================'
+												if ( "${params.service_name}" == 'api-gateway' || "${params.service_name}" == 'sys-center' ||"${params.service_name}" == 'file-center' ||"${params.service_name}" == 'search-center' ||"${params.service_name}" == 'statis-center' ||"${params.service_name}" == 'dmd-center' || "${params.service_name}" == 'catalog-center' ) {
+													sh """
+                                                        echo '================开始部署程序================'
+                                                        ssh  test@173.16.11.83 <<EOF
+                                        				source  /etc/profile
+														mv "${params.service_name}"*.jar /data/apps/webapps/dpd-portal-all/"${params.service_name}"/
+                                                        cd /data/apps/webapps/dpd-portal-all/
+														sh startdocker.sh "${params.service_name}"
+                                        				exit
+                                        				EOF
+                                        			echo '================结束部署程序================'
+                                                 """
+												}else if( "${params.service_name}" == 'dpd-portal')  {
+												  sh """
+                                                        echo '================开始部署程序================'
+                                                        ssh  test@173.16.11.83 <<EOF
+                                        				source  /etc/profile
+                                                         sh /home/publish.sh test
+                                        				exit
+                                        				EOF
+                                        			echo '================结束部署程序================'
+                                                 """
+												}else if( "${params.service_name}" == 'dpd-portal-job-admin' ||"${params.service_name}" == 'dpd-portal-job-executor-springboot')  {
+												  sh """
+                                                        echo '================开始部署程序================'
+                                                        ssh  test@173.16.11.83 <<EOF
+                                        				source  /etc/profile
+														mv "${params.service_name}"*.jar /data/apps/webapps/dpd-portal-job/"${params.service_name}"/
+                                                        sh /data/apps/webapps/dpd-portal-job/startdocker.sh "${params.service_name}" 
+                                        				exit
+                                        				EOF
+                                        			echo '================结束部署程序================'
+                                                 """
+												}else if( "${params.service_name}" == 'dpd-portal-mobile' || "${params.service_name}" == 'dpd-portal-web')  {
+												   sh """
+                                                        echo '================开始传输文件================'
+                                                        ssh test@173.16.11.83  <<EOF
+                                        				source  /etc/profile
+														echo "传输文件"
+														scp "${params.service_name}"*.zip test@173.16.64.182:/apublish-test
+														exit
+														EOF
+                                        			echo '================结束传输文件================'
+                                                 """
+												 sh """
+                                                        echo '================开始部署程序================'
+                                                        ssh test@173.16.64.182  <<EOF
+														source  /etc/profile
+                                                        sh /home/publish.sh test
+														echo "部署完成"
+                                        				exit
+                                        				EOF
+                                        			echo '================结束部署程序================'
+                                                 """
+												}else   {
+												  echo '其他程序'
+												}
+											echo '================结束部署程序================'
+										}
+                                }
+                            }
+                        }
+                }
+    }
