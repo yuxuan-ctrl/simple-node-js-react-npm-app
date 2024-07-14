@@ -26,9 +26,4 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            // cleanWs() // 清理工作空间，可选，根据实际情况决定是否需要
-        }
-    }
 }
