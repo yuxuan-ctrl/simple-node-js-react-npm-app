@@ -29,15 +29,13 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    def archivedFile = archivedArtifacts.get('build').first().absolutePath
-
                     echo 'Deploy'
                     sshagent(credentials: ['jenkins']) {
                         echo 'Logining ==========================Deploy Source'
                         // sh 'ssh -o StrictHostKeyChecking=no root@192.168.227.128 "ls -l /"'
                         sh """
                         echo '================开始部署程序================'
-                        scp -r -o StrictHostKeyChecking=no "${archivedFile}" root@192.168.227.128:/tmp/
+                        scp -r -o StrictHostKeyChecking=no build/* root@192.168.227.128:/tmp/
                         ssh -o StrictHostKeyChecking=no root@192.168.227.128 <<EOF
                             cd /tmp
                             unzip build.zip -d /var/www/html # 假设您的应用需要部署到/var/www/html
