@@ -29,10 +29,21 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploy'
-                sshagent(credentials: ['jenkins']) {
-                    echo 'Logining ==========================Deploy Source'
-                    sh 'ssh -vvv root@192.168.227.128 "ls -l /"'
-                }
+                // sshagent(credentials: ['jenkins']) {
+                //     echo 'Logining ==========================Deploy Source'
+                //     sh 'ssh -vvv root@192.168.227.128 "ls -l /"'
+                // }
+                sh """
+                                                        echo '================开始部署程序================'
+                                                        ssh  root@192.168.227.128 <<EOF
+                                        				source  /etc/profile
+														mv "${params.service_name}"*.jar /data/apps/webapps/dpd-portal-all/"${params.service_name}"/
+                                                        cd /data/apps/webapps/dpd-portal-all/
+														sh startdocker.sh "${params.service_name}"
+                                        				exit
+                                        				EOF
+                                        			echo '================结束部署程序================'
+                                                 """
             }
         }
     }
