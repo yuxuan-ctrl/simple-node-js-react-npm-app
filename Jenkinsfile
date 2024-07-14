@@ -1,15 +1,34 @@
 pipeline {
     agent any
-    tools { nodejs 'nodejs:latest' } // 使用别名 'nodejs:latest' 指定Node.js版本22.4.1
+    tools { nodejs 'nodejs:latest' } // 假设你已经配置了Node.js工具别名
 
     stages {
-        stage('Hello') {
+        stage('Prepare') {
             steps {
-                echo 'Hello World'
+                echo 'Preparing environment'
                 withEnv(["PATH+NODEJS=${tool 'nodejs:latest'}"]) {
-                    sh 'node -v'
+                    sh 'npm install' // 或使用 'npm install' 如果你没有package-lock.json或yarn.lock
                 }
             }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building React application'
+                withEnv(["PATH+NODEJS=${tool 'nodejs:latest'}"]) {
+                    sh 'npm run build'
+                }
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'dist/**' // 将构建输出的'build'目录作为工件保存
+                }
+            }
+        }
+    }
+    post {
+        always {
+            // cleanWs() // 清理工作空间，可选，根据实际情况决定是否需要
         }
     }
 }
