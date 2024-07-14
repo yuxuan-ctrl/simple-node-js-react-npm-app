@@ -17,6 +17,7 @@ pipeline {
                 echo 'Building React application'
                 withEnv(["PATH+NODEJS=${tool 'nodejs:latest'}"]) {
                     sh 'npm run build'
+                    sh 'zip -r build.zip build'
                 }
             }
             post {
@@ -28,18 +29,32 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deploy'
-                sshagent(credentials: ['jenkins']) {
-                    echo 'Logining ==========================Deploy Source'
-                    sh 'ssh -o StrictHostKeyChecking=no root@192.168.227.128 "ls -l /"'
+                script {
+                    def archivedFile = archivedArtifacts.get('build.zip').first().absolutePath
+
+                    echo 'Deploy'
+                    sshagent(credentials: ['jenkins']) {
+                        echo 'Logining ==========================Deploy Source'
+                        // sh 'ssh -o StrictHostKeyChecking=no root@192.168.227.128 "ls -l /"'
+                        sh """
+                                                        echo '================开始部署程序================'
+                                                        ssh -o StrictHostKeyChecking=no root@192.168.227.128 <<EOF
+                                                        source  /etc/profile
+                                                        mv "${archivedFile}" /tmp"/
+                                                        exit
+                                                        EOF
+                                                    echo '================结束部署程序================'
+                                                 """
+                    }
                 }
-                // sh """
-                //                                         echo '================开始部署程序================'
-                //                                         ssh -o StrictHostKeyChecking=no root@192.168.227.128 <<EOF
-                //                                         ls -l
-                //                                         EOF
-                //                                     echo '================结束部署程序================'
-                //                                  """
+
+            // sh """
+            //                                         echo '================开始部署程序================'
+            //                                         ssh -o StrictHostKeyChecking=no root@192.168.227.128 <<EOF
+            //                                         ls -l
+            //                                         EOF
+            //                                     echo '================结束部署程序================'
+            //                                  """
             }
         }
     }
