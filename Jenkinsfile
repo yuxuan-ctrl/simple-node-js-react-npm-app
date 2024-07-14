@@ -31,7 +31,7 @@ pipeline {
                 echo 'Deploy'
                 sshagent(credentials: ['jenkins']) {
                     echo 'Logining ==========================Deploy Source'
-                    sh 'ssh lyx@192.168.227.128 "ls -l /"'
+                    sh 'ssh root@192.168.227.128 "ls -l /"'
                 }
             }
         }
