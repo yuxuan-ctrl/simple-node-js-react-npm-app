@@ -38,9 +38,11 @@ pipeline {
                         scp -r -o StrictHostKeyChecking=no build/* root@192.168.227.128:/data/apps/webapps/dist/
                         ssh -o StrictHostKeyChecking=no root@192.168.227.128 <<EOF
                         cd /data/apps/webapps/dist/
-                        ls -a EOF
-                    """
+                        ls -a
+                        exit
+                        EOF
                         echo '================结束部署程序================'
+                    """
                     }
                 }
 
