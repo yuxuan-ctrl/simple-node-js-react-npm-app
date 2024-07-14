@@ -21,7 +21,7 @@ pipeline {
             }
             post {
                 success {
-                    archiveArtifacts artifacts: 'dist/**' // 将构建输出的'build'目录作为工件保存
+                    archiveArtifacts artifacts: 'build/**' // 将构建输出的'build'目录作为工件保存
                 }
             }
         }
